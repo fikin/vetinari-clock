@@ -2,25 +2,31 @@
 
 This project is implementing a simple Lord Vetinari clock.
 
-The clock seconds hand is otherwise random moving but minutes and hours are exact.
+The clock's seconds hand is otherwise random moving but minutes and hours are exact.
 
-# Usage
+## Usage
 
-Required are NodeMCU gpio and tmw modules. Virtually all nodemcu builds are featuring them.
+Find any NodeMCU chip.
 
-Flash the nodemcu sw to ESP.
+Flash the NodemCU sw to ESP. Required modules are "tmr" and "gpio" which presumably any type of build would contain. Internal algorithmics should be working with integer as well as float builds.
 
-Install init.lua file.
+Install lua/* file to the NodeMCU.
+
+Power on the NodeMCU using usb cable or connecting 5V to the pins directly.
 
 Enjoy the clock.
 
-# Rewiring exinsting clock
+*Note: Start timeout is 5sec in order to allow one to run some command before actual clocking starts. This obviously is aimed at developrs.*
 
-Idea basically is to severe the magnet coil from existing wiring and expose it to 2 nodemcu pins.
+## Rewiring exinsting analog clock
 
-Wiring diagram TODO
+Idea basically is to gain access to both ends of the magnet coil and expose it to 2 nodemcu pins.
 
-# Building
+Wiring diagram is basically explained in [this project](https://www.cibomahto.com/2008/03/controlling-a-clock-with-an-arduino/).
+
+This sw is configuring NodeMCU pins 5 and 6 to connect with the coil.
+
+## Building
 
 TODO
 

@@ -8,8 +8,10 @@ local clock = {
     coilPins = {5, 6},
     maxTicksPerSec = 2,
     usPerMin = 60 * 1000 * 1000,
-    coilOffTimeoutMs = 200,
+    coilOffTimeoutMs = 120,
     ticksPerMin = 60,
+    -- control
+    ticksTimer = nil,
     -- calculated
     maxTicksUs = nil,
     lastTickDeltaUs = nil,
@@ -19,10 +21,15 @@ local clock = {
     -- minute related
     minRemainingTimeUs = nil,
     minRemainingTicks = nil,
-    lastTickTime = nil
+    lastTickTime = nil,
+    -- debug
+    debug = false
 }
 
 local function pinOff()
+    if clock.debug then
+        print('pinOff')
+    end
     gpio.write(clock.coilPins[clock.currentPinOn + 1], gpio.HIGH)
     clock.currentPinOn = 1 - clock.currentPinOn
 end
@@ -57,13 +64,24 @@ local function decideToMove()
 end
 
 local function clockTick(tmrObj)
+    if clock.debug then
+        print("new tick")
+    end
+
     if clock.minRemainingTicks == 0 then
+        if clock.debug then
+            print("new minute")
+        end
         newMinuteStarts()
     end
 
     -- advance time per interrupt
     local now = tmr.now()
-    clock.minRemainingTimeUs = clock.minRemainingTimeUs - (now - clock.lastTickTime)
+    local delta = (now - clock.lastTickTime)
+    if delta < 0 then
+        delta = delta + 2147483647 -- 31bit rollover of tmr.now()
+    end
+    clock.minRemainingTimeUs = clock.minRemainingTimeUs - delta
     clock.lastTickTime = now
     --
 
@@ -76,9 +94,9 @@ local function clockTick(tmrObj)
 end
 
 local function startTickTimer()
-    local tmrTick = tmr.create()
-    tmrTick:register(clock.maxTicksUs / 1000, tmr.ALARM_AUTO, clockTick)
-    tmrTick:start()
+    clock.ticksTimer = tmr.create()
+    clock.ticksTimer:register(clock.maxTicksUs / 1000, tmr.ALARM_AUTO, clockTick)
+    clock.ticksTimer:start()
 end
 
 local function createPinOffTimer()
@@ -108,3 +126,5 @@ local function main()
 end
 
 main()
+
+clockObj = clock
