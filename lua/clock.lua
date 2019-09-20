@@ -27,9 +27,6 @@ local clock = {
 }
 
 local function pinOff()
-    if clock.debug then
-        print('pinOff')
-    end
     gpio.write(clock.coilPins[clock.currentPinOn + 1], gpio.HIGH)
     clock.currentPinOn = 1 - clock.currentPinOn
 end
@@ -64,14 +61,7 @@ local function decideToMove()
 end
 
 local function clockTick(tmrObj)
-    if clock.debug then
-        print("new tick")
-    end
-
     if clock.minRemainingTicks == 0 then
-        if clock.debug then
-            print("new minute")
-        end
         newMinuteStarts()
     end
 
