@@ -5,7 +5,7 @@ Authors : Nikolay Fiykov, v1
 --]]
 local function startup()
     print("in startup")
-    dofile("clock.lua")
+    require("clock")("silent")({5, 6})
 end
 
 print("5 sec to start clock ...")

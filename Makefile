@@ -2,30 +2,26 @@
 # Author: Nikolay Fiykov
 
 PRJ_DIR := $(shell pwd)
-PRJ_SRC_DIR := $(PRJ_DIR)/lua
+PRJ_SRC_DIR := $(PRJ_DIR)
 PRJ_CONTRIB_SRC_DIR := $(PRJ_DIR)/contrib
 
-GIT_ROOT_DIR := $(shell cd $(PRJ_DIR)/../.. && pwd)
+LUA_PATH := $(PRJ_SRC_DIR)/lua/?.lua\;$(PRJ_CONTRIB_SRC_DIR)/lua/?.lua\;$(PRJ_SRC_DIR)/test/?.lua
 
-LUA_PATH := $(PRJ_SRC_DIR)/?.lua\;$(PRJ_CONTRIB_SRC_DIR)/?.lua
+LUA_TEST_CASES := $(wildcard $(PRJ_DIR)/test/*est*.lua)
 
-LUA_TEST_CASES := $(wildcard $(PRJ_DIR)/test*est*.lua)
-
-.PHONY: help clean test dist upload-rock $(LUA_TEST_CASES)
+.PHONY: help clean test $(LUA_TEST_CASES)
 
 help:
-	@echo type: make clean
 	@echo type: make test
-	@echo type: make dist
 
 clean:
-	rm -rf $(PRJ_DIR)/dist
+	@rm -rf $(PRJ_CONTRIB_SRC_DIR)
 
 $(LUA_TEST_CASES):
 	@echo [INFO] : Running tests in $@ ...
 	@export LUA_PATH=$(LUA_PATH) && lua $@
 
-test: $(PRJ_DIR)/target $(LUA_TEST_CASES)
+$(PRJ_CONTRIB_SRC_DIR):
+	@git clone https://github.com/fikin/nodemcu-lua-mocks.git $(PRJ_CONTRIB_SRC_DIR)
 
-dist:
-	cp $(PRJ_SRC_DIR)/*.lua $(PRJ_DIR)/dist/
+test: $(PRJ_CONTRIB_SRC_DIR) $(LUA_TEST_CASES)
